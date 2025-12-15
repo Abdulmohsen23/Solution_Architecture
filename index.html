@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TDF/DT Sizing Criteria</title>
+
+  <style>
+    :root{
+      --bg:#0f1115;
+      --card:#171a21;
+      --muted:#9aa4b2;
+      --text:#e7eaf0;
+      --line:#262b36;
+      --accent:#7aa2ff;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 15% 10%, rgba(122,162,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 85% 25%, rgba(54,211,153,.10), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      font-family:var(--font);
+    }
+
+    .wrap{ max-width: 980px; margin: 32px auto; padding: 0 16px 40px; }
+
+    header{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom: 18px;
+    }
+    .title h1{ margin:0; font-size: 22px; letter-spacing:.2px; }
+    .title p{ margin:6px 0 0; color:var(--muted); font-size: 13px; line-height:1.4; }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .grid{ display:grid; grid-template-columns: 1.35fr .65fr; gap: 16px; }
+    @media (max-width: 880px){ .grid{ grid-template-columns:1fr; } }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding: 14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .card .hd b{ font-size: 13px; letter-spacing:.2px; }
+    .card .bd{ padding: 16px; }
+
+    .q{
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 12px;
+      background: rgba(0,0,0,.12);
+      margin-bottom: 10px;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .q:hover{ transform: translateY(-1px); border-color: rgba(122,162,255,.35); }
+
+    .q label{ display:block; font-size: 13px; margin-bottom: 8px; }
+    .hint{ color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    /* Inputs */
+    select, input[type="number"]{
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 10px;
+      outline:none;
+      font-size: 13px;
+    }
+
+    /* ✅ Make dropdown options visible */
+    select option{
+      background: #0f1115;       /* dark background */
+      color: #e7eaf0;            /* light text */
+    }
+
+    /* Better focus state */
+    select:focus, input[type="number"]:focus{
+      border-color: rgba(122,162,255,.55);
+      box-shadow: 0 0 0 3px rgba(122,162,255,.15);
+    }
+
+    input[type="checkbox"]{ transform: translateY(1px); }
+
+    .checks{ display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+    .checks .opt{
+      display:flex; gap:10px; align-items:center;
+      padding: 8px 10px;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.02);
+    }
+    .checks .opt span{ font-size: 13px; }
+
+    .muted{ color: var(--muted); font-size: 12px; }
+
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-size: 13px;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    button:hover{ transform: translateY(-1px); border-color: rgba(122,162,255,.35); }
+    .primary{ border-color: rgba(122,162,255,.45); background: rgba(122,162,255,.10); }
+
+    .scoreBox{ display:grid; gap:10px; }
+
+    .kpi{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(0,0,0,.12);
+    }
+    .kpi .big{ font-size: 30px; font-weight: 700; margin: 2px 0; }
+    .kpi .sub{ color:var(--muted); font-size: 12px; }
+
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      width: fit-content;
+      margin-top: 6px;
+    }
+
+    /* 3-level styling */
+    .badge.medium{ border-color: rgba(122,162,255,.45); background: rgba(122,162,255,.10); }
+    .badge.high{ border-color: rgba(251,191,36,.40); background: rgba(251,191,36,.10); }
+    .badge.complex{ border-color: rgba(251,113,133,.45); background: rgba(251,113,133,.10); }
+
+    .breakdown{
+      border-top:1px solid var(--line);
+      margin-top: 10px; padding-top: 10px;
+      display:grid; gap: 8px;
+    }
+    .item{
+      display:flex; justify-content:space-between; gap:10px;
+      font-size: 12px; color: var(--muted);
+    }
+    .item b{ color: var(--text); font-weight: 600; }
+
+    .hidden{ display:none; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>TDF/DT Ticket Sizing</h1>
+        <p>Answer the questions and the page will calculate a score and classify the ticket as <b>Medium</b>, <b>High</b>, or <b>Complex</b>.</p>
+      </div>
+      <div class="pill">
+        <span>Model:</span>
+        <b>Points-based</b>
+        <span class="muted">• tune weights later</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Form -->
+      <div class="card">
+        <div class="hd">
+          <b>Classification Criteria</b>
+          <div class="btns">
+            <button class="primary" id="btnCalc">Calculate</button>
+            <button id="btnReset">Reset</button>
+          </div>
+        </div>
+
+        <div class="bd" id="form">
+          <!-- Q1 -->
+          <div class="q">
+            <label>1) Has this been implemented before or similar to an existing feature/behavior?</label>
+            <select id="q1">
+              <option value="">Select…</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+            <div class="hint">Yes reduces complexity (negative points).</div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="q">
+            <label>2) How many impacted systems? (numeric)</label>
+            <input type="number" id="q2" min="1" step="1" placeholder="e.g., 3" />
+            <div class="hint">At least 1.</div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="q">
+            <label>3) What is the type of the change?</label>
+            <select id="q3">
+              <option value="">Select…</option>
+              <option value="fe">FE</option>
+              <option value="be">BE</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+
+          <!-- Q4 -->
+          <div class="q">
+            <label>4) Does it require FE/BE Integration?</label>
+            <select id="q4">
+              <option value="">Select…</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <!-- Q5 (conditional: show if FE or Both) -->
+          <div class="q hidden" id="q5Box">
+            <label>5) What are the targeted FE channels? (multi-select)</label>
+            <div class="checks" id="q5">
+              <label class="opt"><input type="checkbox" value="none" /> <span>None</span></label>
+              <label class="opt"><input type="checkbox" value="mobile" /> <span>Mobile app</span></label>
+              <label class="opt"><input type="checkbox" value="web_ind" /> <span>Web app (Individuals)</span></label>
+              <label class="opt"><input type="checkbox" value="web_sme" /> <span>Web app (SME Portal)</span></label>
+              <label class="opt"><input type="checkbox" value="corp" /> <span>Corporate/Sales Portal</span></label>
+            </div>
+            <div class="hint">+1 per channel selected (None adds 0).</div>
+          </div>
+
+          <!-- Q6 -->
+          <div class="q">
+            <label>6) Does it require core system change?</label>
+            <select id="q6">
+              <option value="">Select…</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <!-- Q7 (conditional: show if Q6 yes) -->
+          <div class="q hidden" id="q7Box">
+            <label>7) What are the targeted core systems? (multi-select)</label>
+            <div class="checks" id="q7">
+              <label class="opt"><input type="checkbox" value="eska" /> <span>ESKA</span></label>
+              <label class="opt"><input type="checkbox" value="penta" /> <span>PENTA</span></label>
+            </div>
+            <div class="hint">+3 per core system selected.</div>
+          </div>
+
+          <!-- Q8 -->
+          <div class="q">
+            <label>8) Does it require third party/aggregator integration?</label>
+            <select id="q8">
+              <option value="">Select…</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <!-- Q9 (conditional: show if Q8 yes) -->
+          <div class="q hidden" id="q9Box">
+            <label>9) How many integrated third parties? (numeric)</label>
+            <input type="number" id="q9" min="1" step="1" placeholder="e.g., 2" />
+            <div class="hint">At least 1.</div>
+          </div>
+
+          <!-- Q10 -->
+          <div class="q">
+            <label>10) Does it require notification center / Genesys / Kafka brokers involvement?</label>
+            <select id="q10">
+              <option value="">Select…</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <div class="muted">Tip: Adjust weights and thresholds inside the script section.</div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="card">
+        <div class="hd">
+          <b>Result</b>
+          <span class="muted">Auto-updated</span>
+        </div>
+
+        <div class="bd scoreBox">
+          <div class="kpi">
+            <div class="sub">Total score</div>
+            <div class="big" id="score">—</div>
+            <div class="badge" id="sizeBadge">Size: —</div>
+
+            <div class="breakdown" id="breakdown"></div>
+          </div>
+
+          <div class="kpi">
+            <div class="sub">Thresholds</div>
+            <div class="muted" id="thresholdText">
+              0–10 = Medium<br/>
+              11–20 = High<br/>
+              21+ = Complex
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Helpers ----------
+    const $ = (id) => document.getElementById(id);
+
+    function selectedCheckboxValues(containerId){
+      return Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]:checked`))
+        .map(x => x.value);
+    }
+
+    function setBoxVisible(boxId, visible){
+      $(boxId).classList.toggle('hidden', !visible);
+    }
+
+    function enforceNoneBehavior(containerId){
+      const boxes = Array.from(document.querySelectorAll(`#${containerId} input[type="checkbox"]`));
+      const none = boxes.find(x => x.value === "none");
+      if(!none) return;
+
+      none.addEventListener("change", () => {
+        if(none.checked){
+          boxes.forEach(x => { if(x !== none) x.checked = false; });
+        }
+        calculate();
+      });
+
+      boxes.forEach(x => {
+        if(x.value !== "none"){
+          x.addEventListener("change", () => {
+            if(x.checked) none.checked = false;
+            calculate();
+          });
+        }
+      });
+    }
+
+    // ---------- Show/Hide Logic ----------
+    function updateVisibility(){
+      const changeType = $("q3").value; // fe, be, both
+      setBoxVisible("q5Box", changeType === "fe" || changeType === "both");
+
+      const coreChange = $("q6").value;
+      setBoxVisible("q7Box", coreChange === "yes");
+
+      const thirdParty = $("q8").value;
+      setBoxVisible("q9Box", thirdParty === "yes");
+    }
+
+    // ---------- Scoring ----------
+    function scoreImpactedSystems(n){
+      if(!Number.isFinite(n) || n < 1) return null;
+      if(n === 1) return 2;
+      if(n <= 3) return 4;
+      if(n <= 5) return 6;
+      return 8;
+    }
+
+    function scoreThirdParties(n){
+      if(!Number.isFinite(n) || n < 1) return null;
+      if(n === 1) return 2;
+      if(n <= 3) return 4;
+      if(n <= 5) return 6;
+      return 8;
+    }
+
+    // ✅ NEW: 3-level classification (Medium / High / Complex)
+    function classify(total){
+      if(total <= 10) return { label:"Medium", cls:"medium" };
+      if(total <= 20) return { label:"High", cls:"high" };
+      return { label:"Complex", cls:"complex" };
+    }
+
+    function calculate(){
+      updateVisibility();
+
+      const breakdown = [];
+      let total = 0;
+      let valid = true;
+
+      // Q1
+      const q1 = $("q1").value;
+      if(!q1) valid = false;
+      else{
+        const pts = (q1 === "yes") ? -4 : 0;
+        total += pts;
+        breakdown.push(["Q1 Similar implemented", pts]);
+      }
+
+      // Q2
+      const q2 = Number($("q2").value);
+      const q2pts = scoreImpactedSystems(q2);
+      if(q2pts === null) valid = false;
+      else{
+        total += q2pts;
+        breakdown.push(["Q2 Impacted systems", q2pts]);
+      }
+
+      // Q3
+      const q3 = $("q3").value;
+      if(!q3) valid = false;
+      else{
+        const map = { fe:2, be:3, both:6 };
+        total += map[q3];
+        breakdown.push(["Q3 Change type", map[q3]]);
+      }
+
+      // Q4
+      const q4 = $("q4").value;
+      if(!q4) valid = false;
+      else{
+        const pts = (q4 === "yes") ? 4 : 0;
+        total += pts;
+        breakdown.push(["Q4 FE/BE integration", pts]);
+      }
+
+      // Q5 (only if visible)
+      if(!$("q5Box").classList.contains("hidden")){
+        const vals = selectedCheckboxValues("q5");
+        const pts = vals.includes("none") ? 0 : vals.length * 1;
+        total += pts;
+        breakdown.push(["Q5 FE channels", pts]);
+      }
+
+      // Q6
+      const q6 = $("q6").value;
+      if(!q6) valid = false;
+      else{
+        const pts = (q6 === "yes") ? 2 : 0;
+        total += pts;
+        breakdown.push(["Q6 Core system change", pts]);
+      }
+
+      // Q7 (if core change yes)
+      if(!$("q7Box").classList.contains("hidden")){
+        const vals = selectedCheckboxValues("q7");
+        const pts = vals.length * 3;
+        total += pts;
+        breakdown.push(["Q7 Core systems targeted", pts]);
+      }
+
+      // Q8
+      const q8 = $("q8").value;
+      if(!q8) valid = false;
+      else{
+        const pts = (q8 === "yes") ? 2 : 0;
+        total += pts;
+        breakdown.push(["Q8 Third-party integration", pts]);
+      }
+
+      // Q9 (if third party yes)
+    //   if(!$("q9Box").classList.contains("hidden")){
+    //     const q9 = Number($("q9").value);
+    //     const q9pts = scoreThirdParties(q9);
+    //     if(q9pts === null) valid = false;
+    //     else{
+    //       total += q9pts;
+    //       breakdown.push(["Q9 points of third parties", q9pts]);
+    //     }
+    //   }
+
+        // Q9 (if third party yes)
+        if(!$("q9Box").classList.contains("hidden")){
+        const q9 = Number($("q9").value);
+
+        if(!Number.isFinite(q9) || q9 < 1){
+            valid = false;
+        } else {
+            const q9pts = q9 * 1; // ✅ 1 point per third party
+            total += q9pts;
+            breakdown.push(["Q9 # of third parties", q9pts]);
+        }
+        }
+
+
+      // Q10
+      const q10 = $("q10").value;
+      if(!q10) valid = false;
+      else{
+        const pts = (q10 === "yes") ? 4 : 0;
+        total += pts;
+        breakdown.push(["Q10 Notifications/Genesys/Kafka", pts]);
+      }
+
+      // Render
+      $("score").textContent = valid ? String(total) : "—";
+
+      const badge = $("sizeBadge");
+      badge.className = "badge"; // reset
+      if(valid){
+        const res = classify(total);
+        badge.textContent = "Size: " + res.label;
+        badge.classList.add(res.cls);
+      } else {
+        badge.textContent = "Size: —";
+      }
+
+      // breakdown
+      const bd = $("breakdown");
+      bd.innerHTML = "";
+      breakdown.forEach(([label, pts]) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `<span>${label}</span><b>${pts >= 0 ? "+"+pts : pts}</b>`;
+        bd.appendChild(div);
+      });
+    }
+
+    function resetAll(){
+      ["q1","q2","q3","q4","q6","q8","q9","q10"].forEach(id => $(id).value = "");
+      document.querySelectorAll('input[type="checkbox"]').forEach(x => x.checked = false);
+      updateVisibility();
+      calculate();
+    }
+
+    // Initialize
+    enforceNoneBehavior("q5");
+
+    ["q1","q2","q3","q4","q6","q8","q9","q10"].forEach(id => $(id).addEventListener("input", calculate));
+    document.querySelectorAll('input[type="checkbox"]').forEach(x => x.addEventListener("change", calculate));
+
+    $("btnCalc").addEventListener("click", calculate);
+    $("btnReset").addEventListener("click", resetAll);
+
+    updateVisibility();
+    calculate();
+  </script>
+</body>
+</html>
