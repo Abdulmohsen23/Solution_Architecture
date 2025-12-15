@@ -388,10 +388,10 @@
           <div class="kpi">
             <div class="sub">Thresholds</div>
             <div class="muted" id="thresholdText">
-              0–6 = Small<br/>
-              7–12 = Medium<br/>
-              13–20 = Large<br/>
-              21+ = Complex
+              0–10 = Small<br/>
+              11–18 = Medium<br/>
+              19–28 = Large<br/>
+              29+ = Complex
             </div>
           </div>
         </div>
@@ -454,9 +454,9 @@
 
     // 4-level classification (Small / Medium / Large / Complex)
     function classify(total){
-      if(total <= 6)  return { label:"Small",   cls:"small" };
-      if(total <= 12) return { label:"Medium",  cls:"medium" };
-      if(total <= 20) return { label:"Large",   cls:"large" };
+      if(total <= 10)  return { label:"Small",   cls:"small" };
+      if(total <= 18) return { label:"Medium",  cls:"medium" };
+      if(total <= 28) return { label:"Large",   cls:"large" };
       return            { label:"Complex", cls:"complex" };
     }
 
@@ -471,16 +471,27 @@
       const q1 = $("q1").value;
       if(!q1) valid = false;
       else{
-        const pts = (q1 === "yes") ? -9 : 0;  // keep your current logic
+        const pts = (q1 === "yes") ? -10 : 0;  // keep your current logic
         total += pts;
         breakdown.push(["Q1 Similar implemented", pts]);
       }
 
       // Q2
+      // const q2 = Number($("q2").value);
+      // const q2pts = scoreImpactedSystems(q2);
+      // if(q2pts === null) valid = false;
+      // else{
+      //   total += q2pts;
+      //   breakdown.push(["Q2 Impacted systems", q2pts]);
+      // }
+      
+      //Q2
       const q2 = Number($("q2").value);
-      const q2pts = scoreImpactedSystems(q2);
-      if(q2pts === null) valid = false;
-      else{
+
+      if(!Number.isFinite(q2) || q2 < 1){
+        valid = false;
+      } else {
+        const q2pts = q2 * 1; // ✅ 1 point per impacted system
         total += q2pts;
         breakdown.push(["Q2 Impacted systems", q2pts]);
       }
@@ -627,4 +638,3 @@
   </script>
 </body>
 </html>
-
